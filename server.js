@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const http = require('http');
 const socketIo = require('socket.io');
+const path = require('path');
 
 // Load environment variables
 dotenv.config();
@@ -78,6 +79,15 @@ io.on('connection', (socket) => {
     console.log('Client disconnected');
   });
 });
+
+// Serve static files in production
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static('client/build'));
+  
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
+  });
+}
 
 const PORT = process.env.PORT || 5000;
 
