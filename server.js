@@ -13,12 +13,19 @@ const app = express();
 const server = http.createServer(app);
 
 // Update PORT for Replit
-const PORT = process.env.PORT || 5000;  // Changed to 5000 to match your current setup
+const PORT = process.env.PORT || 5000;
 
 // Handle Replit-specific environment
 const CLIENT_URL = process.env.REPL_SLUG 
   ? `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co`
   : process.env.CLIENT_URL || `http://localhost:${PORT}`;
+
+console.log('Environment:', {
+  NODE_ENV: process.env.NODE_ENV,
+  REPL_SLUG: process.env.REPL_SLUG,
+  CLIENT_URL,
+  PORT
+});
 
 const io = socketIo(server, {
   cors: {
@@ -47,6 +54,11 @@ mongoose.connect(MONGODB_URI, {
 })
 .then(() => console.log('MongoDB connected'))
 .catch(err => console.log('MongoDB connection error:', err));
+
+// Debug route
+app.get('/api/test', (req, res) => {
+  res.json({ message: 'API is working!' });
+});
 
 // Routes
 app.use('/api/auth', require('./server/routes/auth'));
@@ -90,27 +102,37 @@ io.on('connection', (socket) => {
   });
 });
 
-// API test route
-app.get('/api/test', (req, res) => {
-  res.json({ message: 'API is working!' });
-});
-
 // Serve static files in production or Replit environment
 if (process.env.NODE_ENV === 'production' || process.env.REPL_SLUG) {
-  console.log('Serving static files from client/build');
+  const clientBuildPath = path.join(__dirname, 'client', 'build');
+  console.log('Client build path:', clientBuildPath);
   
+  // Verify the build directory exists
+  const fs = require('fs');
+  if (fs.existsSync(clientBuildPath)) {
+    console.log('Client build directory exists');
+    console.log('Contents:', fs.readdirSync(clientBuildPath));
+  } else {
+    console.log('Client build directory does not exist');
+  }
+
   // Serve static files from the React app
-  app.use(express.static(path.join(__dirname, 'client/build')));
+  app.use(express.static(clientBuildPath));
   
   // The "catchall" handler: for any request that doesn't
   // match one above, send back React's index.html file.
   app.get('*', (req, res) => {
-    console.log(`Serving index.html for ${req.url}`);
-    res.sendFile(path.join(__dirname, 'client/build/index.html'));
+    console.log(`Request for: ${req.url}`);
+    const indexPath = path.join(clientBuildPath, 'index.html');
+    if (fs.existsSync(indexPath)) {
+      res.sendFile(indexPath);
+    } else {
+      res.status(404).send('Build not found. Please run npm run build in the client directory.');
+    }
   });
 } else {
   app.get('/', (req, res) => {
-    res.send('API is running... Please start the React development server for the frontend.');
+    res.send('Server is running in development mode. Please start the React development server.');
   });
 }
 

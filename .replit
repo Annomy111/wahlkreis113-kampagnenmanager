@@ -1,3 +1,10 @@
+run = "npm run setup && npm run start"
 language = "nodejs"
-run = "npm run setup && npm start"
 entrypoint = "server.js"
+
+[nix]
+channel = "stable-22_11"
+
+[deployment]
+run = ["sh", "-c", "npm run start"]
+deploymentTarget = "cloudrun"
