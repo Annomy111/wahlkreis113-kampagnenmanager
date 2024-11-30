@@ -11,10 +11,20 @@ dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
+
+// Update PORT for Replit
+const PORT = process.env.PORT || 3000;
+
+// Handle Replit-specific environment
+const CLIENT_URL = process.env.REPL_SLUG 
+  ? `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co`
+  : process.env.CLIENT_URL || `http://localhost:${PORT}`;
+
 const io = socketIo(server, {
   cors: {
-    origin: process.env.CLIENT_URL || "http://localhost:3000",
-    methods: ["GET", "POST"]
+    origin: CLIENT_URL,
+    methods: ['GET', 'POST'],
+    credentials: true
   }
 });
 
@@ -22,12 +32,16 @@ const io = socketIo(server, {
 app.set('io', io);
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: CLIENT_URL,
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Database connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/wahlkreis113', {
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost/wahlkreis113';
+mongoose.connect(MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
@@ -45,19 +59,16 @@ app.use('/api/chat', require('./server/routes/chat'));
 io.on('connection', (socket) => {
   console.log('New client connected');
   
-  // Join chat rooms
   socket.on('joinRoom', (roomId) => {
     socket.join(roomId);
     console.log(`User joined room: ${roomId}`);
   });
 
-  // Leave chat rooms
   socket.on('leaveRoom', (roomId) => {
     socket.leave(roomId);
     console.log(`User left room: ${roomId}`);
   });
 
-  // Handle new messages
   socket.on('sendMessage', async (data) => {
     try {
       const { roomId, message } = data;
@@ -67,7 +78,6 @@ io.on('connection', (socket) => {
     }
   });
 
-  // Handle typing status
   socket.on('typing', (data) => {
     socket.to(data.roomId).emit('userTyping', {
       userId: data.userId,
@@ -80,8 +90,8 @@ io.on('connection', (socket) => {
   });
 });
 
-// Serve static files in production
-if (process.env.NODE_ENV === 'production') {
+// Serve static files in production or Replit environment
+if (process.env.NODE_ENV === 'production' || process.env.REPL_SLUG) {
   console.log('Serving static files from client/build');
   app.use(express.static('client/build'));
   
@@ -91,8 +101,7 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-const PORT = process.env.PORT || 5000;
-
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  console.log(`Client URL: ${CLIENT_URL}`);
 });

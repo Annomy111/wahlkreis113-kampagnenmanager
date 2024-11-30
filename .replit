@@ -1,0 +1,3 @@
+language = "nodejs"
+run = "npm run setup && npm start"
+entrypoint = "server.js"
