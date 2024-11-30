@@ -12,8 +12,8 @@ dotenv.config();
 const app = express();
 const server = http.createServer(app);
 
-// Update PORT for Replit
-const PORT = process.env.PORT || 5000;
+// Update PORT for Replit - try different ports if one is in use
+const PORT = process.env.PORT || 3001;
 
 // Handle Replit-specific environment
 const CLIENT_URL = process.env.REPL_SLUG 
@@ -136,7 +136,37 @@ if (process.env.NODE_ENV === 'production' || process.env.REPL_SLUG) {
   });
 }
 
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`Client URL: ${CLIENT_URL}`);
-});
+// Error handling for server start
+const startServer = () => {
+  server.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+    console.log(`Client URL: ${CLIENT_URL}`);
+  })
+  .on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+      console.log(`Port ${PORT} is busy, trying port ${PORT + 1}`);
+      setTimeout(() => {
+        server.close();
+        server.listen(PORT + 1);
+      }, 1000);
+    } else {
+      console.error('Server error:', err);
+    }
+  });
+};
+
+// Kill any existing process on the port (only in development)
+if (process.env.NODE_ENV !== 'production') {
+  const killPort = require('kill-port');
+  killPort(PORT)
+    .then(() => {
+      console.log(`Killed process on port ${PORT}`);
+      startServer();
+    })
+    .catch(() => {
+      // If kill-port fails or port wasn't in use, start server anyway
+      startServer();
+    });
+} else {
+  startServer();
+}
