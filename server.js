@@ -12,17 +12,24 @@ dotenv.config();
 const app = express();
 const server = http.createServer(app);
 
-// For Replit, we'll use port 3000
-const PORT = process.env.PORT || 3000;
+// For Replit, we need to use port 3000 or the port provided by Replit
+const PORT = parseInt(process.env.PORT || '3000');
 
 // Handle Replit-specific environment
 const CLIENT_URL = process.env.REPL_SLUG 
   ? `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co`
   : process.env.CLIENT_URL || `http://localhost:${PORT}`;
 
+console.log('Starting server with configuration:', {
+  PORT,
+  CLIENT_URL,
+  NODE_ENV: process.env.NODE_ENV,
+  REPL_SLUG: process.env.REPL_SLUG
+});
+
 const io = socketIo(server, {
   cors: {
-    origin: '*',  // For development, allowing all origins
+    origin: '*',  // For development
     methods: ['GET', 'POST'],
     credentials: true
   }
@@ -33,7 +40,7 @@ app.set('io', io);
 
 // Middleware
 app.use(cors({
-  origin: '*',  // For development, allowing all origins
+  origin: '*',  // For development
   credentials: true
 }));
 app.use(express.json());
@@ -50,7 +57,7 @@ mongoose.connect(MONGODB_URI, {
 
 // Test route
 app.get('/api/test', (req, res) => {
-  res.json({ message: 'API is working!' });
+  res.json({ message: 'API is working!', port: PORT });
 });
 
 // Routes
@@ -101,7 +108,7 @@ if (process.env.NODE_ENV === 'production' || process.env.REPL_SLUG) {
   app.use(express.static(path.join(__dirname, 'client/build')));
   
   app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'client/build/index.html'));
+    res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
   });
 } else {
   app.get('/', (req, res) => {
@@ -109,12 +116,29 @@ if (process.env.NODE_ENV === 'production' || process.env.REPL_SLUG) {
   });
 }
 
-// Start server with error handling
-const startServer = async () => {
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Something broke!');
+});
+
+// Start server with retry logic
+const startServer = async (retryCount = 0) => {
   try {
-    server.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-      console.log(`Client URL: ${CLIENT_URL}`);
+    await new Promise((resolve, reject) => {
+      server.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+        console.log(`Client URL: ${CLIENT_URL}`);
+        resolve();
+      }).on('error', (err) => {
+        if (err.code === 'EADDRINUSE' && retryCount < 3) {
+          console.log(`Port ${PORT} is busy, retrying on port ${PORT + 1}`);
+          PORT = PORT + 1;
+          resolve(startServer(retryCount + 1));
+        } else {
+          reject(err);
+        }
+      });
     });
   } catch (error) {
     console.error('Failed to start server:', error);
@@ -122,4 +146,5 @@ const startServer = async () => {
   }
 };
 
+// Start the server
 startServer();
