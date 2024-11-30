@@ -12,24 +12,17 @@ dotenv.config();
 const app = express();
 const server = http.createServer(app);
 
-// Update PORT for Replit - try different ports if one is in use
-const PORT = process.env.PORT || 3001;
+// For Replit, we'll use port 3000
+const PORT = process.env.PORT || 3000;
 
 // Handle Replit-specific environment
 const CLIENT_URL = process.env.REPL_SLUG 
   ? `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co`
   : process.env.CLIENT_URL || `http://localhost:${PORT}`;
 
-console.log('Environment:', {
-  NODE_ENV: process.env.NODE_ENV,
-  REPL_SLUG: process.env.REPL_SLUG,
-  CLIENT_URL,
-  PORT
-});
-
 const io = socketIo(server, {
   cors: {
-    origin: CLIENT_URL,
+    origin: '*',  // For development, allowing all origins
     methods: ['GET', 'POST'],
     credentials: true
   }
@@ -40,7 +33,7 @@ app.set('io', io);
 
 // Middleware
 app.use(cors({
-  origin: CLIENT_URL,
+  origin: '*',  // For development, allowing all origins
   credentials: true
 }));
 app.use(express.json());
@@ -55,7 +48,7 @@ mongoose.connect(MONGODB_URI, {
 .then(() => console.log('MongoDB connected'))
 .catch(err => console.log('MongoDB connection error:', err));
 
-// Debug route
+// Test route
 app.get('/api/test', (req, res) => {
   res.json({ message: 'API is working!' });
 });
@@ -104,69 +97,29 @@ io.on('connection', (socket) => {
 
 // Serve static files in production or Replit environment
 if (process.env.NODE_ENV === 'production' || process.env.REPL_SLUG) {
-  const clientBuildPath = path.join(__dirname, 'client', 'build');
-  console.log('Client build path:', clientBuildPath);
+  console.log('Serving static files from client/build');
+  app.use(express.static(path.join(__dirname, 'client/build')));
   
-  // Verify the build directory exists
-  const fs = require('fs');
-  if (fs.existsSync(clientBuildPath)) {
-    console.log('Client build directory exists');
-    console.log('Contents:', fs.readdirSync(clientBuildPath));
-  } else {
-    console.log('Client build directory does not exist');
-  }
-
-  // Serve static files from the React app
-  app.use(express.static(clientBuildPath));
-  
-  // The "catchall" handler: for any request that doesn't
-  // match one above, send back React's index.html file.
   app.get('*', (req, res) => {
-    console.log(`Request for: ${req.url}`);
-    const indexPath = path.join(clientBuildPath, 'index.html');
-    if (fs.existsSync(indexPath)) {
-      res.sendFile(indexPath);
-    } else {
-      res.status(404).send('Build not found. Please run npm run build in the client directory.');
-    }
+    res.sendFile(path.join(__dirname, 'client/build/index.html'));
   });
 } else {
   app.get('/', (req, res) => {
-    res.send('Server is running in development mode. Please start the React development server.');
+    res.send('Server is running in development mode.');
   });
 }
 
-// Error handling for server start
-const startServer = () => {
-  server.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-    console.log(`Client URL: ${CLIENT_URL}`);
-  })
-  .on('error', (err) => {
-    if (err.code === 'EADDRINUSE') {
-      console.log(`Port ${PORT} is busy, trying port ${PORT + 1}`);
-      setTimeout(() => {
-        server.close();
-        server.listen(PORT + 1);
-      }, 1000);
-    } else {
-      console.error('Server error:', err);
-    }
-  });
+// Start server with error handling
+const startServer = async () => {
+  try {
+    server.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+      console.log(`Client URL: ${CLIENT_URL}`);
+    });
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  }
 };
 
-// Kill any existing process on the port (only in development)
-if (process.env.NODE_ENV !== 'production') {
-  const killPort = require('kill-port');
-  killPort(PORT)
-    .then(() => {
-      console.log(`Killed process on port ${PORT}`);
-      startServer();
-    })
-    .catch(() => {
-      // If kill-port fails or port wasn't in use, start server anyway
-      startServer();
-    });
-} else {
-  startServer();
-}
+startServer();
