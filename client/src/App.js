@@ -8,6 +8,9 @@ function App() {
         <Typography variant="h4" component="h1" gutterBottom>
           Wahlkreis 113 Kampagnenmanager
         </Typography>
+        <Typography variant="body1">
+          Willkommen bei Ihrem Kampagnenmanagement-Tool
+        </Typography>
       </Box>
     </Container>
   );
