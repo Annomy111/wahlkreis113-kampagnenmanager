@@ -82,9 +82,11 @@ io.on('connection', (socket) => {
 
 // Serve static files in production
 if (process.env.NODE_ENV === 'production') {
+  console.log('Serving static files from client/build');
   app.use(express.static('client/build'));
   
   app.get('*', (req, res) => {
+    console.log(`Serving index.html for ${req.url}`);
     res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
   });
 }
