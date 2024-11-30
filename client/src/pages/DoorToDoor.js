@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, useTheme } from '@material-ui/core/styles';
 import {
   Grid,
   Paper,
   Typography,
   Button,
-  Card,
-  CardContent,
-  CardActions,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -31,7 +28,6 @@ import {
   Person as PersonIcon,
   Add as AddIcon,
   Edit as EditIcon,
-  Delete as DeleteIcon,
   Check as CheckIcon,
   Clear as ClearIcon,
   Room as LocationIcon
@@ -49,14 +45,6 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: theme.spacing(3),
-  },
-  card: {
-    height: '100%',
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  cardContent: {
-    flexGrow: 1,
   },
   districtInfo: {
     marginBottom: theme.spacing(2),
@@ -87,9 +75,9 @@ const useStyles = makeStyles((theme) => ({
 const DoorToDoor = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
+  const theme = useTheme();
   const [districts, setDistricts] = useState([]);
   const [selectedDistrict, setSelectedDistrict] = useState(null);
-  const [openDialog, setOpenDialog] = useState(false);
   const [householdDialog, setHouseholdDialog] = useState(false);
   const [formData, setFormData] = useState({
     street: '',
@@ -102,7 +90,7 @@ const DoorToDoor = () => {
 
   useEffect(() => {
     loadDistricts();
-  }, []);
+  }, [loadDistricts]);
 
   const loadDistricts = async () => {
     try {
@@ -137,7 +125,6 @@ const DoorToDoor = () => {
   };
 
   const handleCloseDialog = () => {
-    setOpenDialog(false);
     setHouseholdDialog(false);
   };
 

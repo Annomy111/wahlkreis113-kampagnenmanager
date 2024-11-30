@@ -12,7 +12,7 @@ import {
   CircularProgress,
   Snackbar
 } from '@material-ui/core';
-import { Alert } from '@material-ui/lab';
+import { Alert } from '@mui/lab';
 
 const useStyles = makeStyles((theme) => ({
   root: {

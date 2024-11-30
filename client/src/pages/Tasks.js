@@ -10,7 +10,6 @@ import {
   ListItem,
   ListItemText,
   ListItemIcon,
-  ListItemSecondary,
   Chip,
   IconButton,
   Button,
@@ -142,19 +141,6 @@ const Tasks = () => {
   const handleCloseDialog = () => {
     setOpenDialog(false);
     setSelectedTask(null);
-  };
-
-  const getPriorityColor = (priority) => {
-    switch (priority) {
-      case 'high':
-        return classes.priorityHigh;
-      case 'medium':
-        return classes.priorityMedium;
-      case 'low':
-        return classes.priorityLow;
-      default:
-        return '';
-    }
   };
 
   const getStatusIcon = (status) => {

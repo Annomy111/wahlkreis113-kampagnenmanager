@@ -8,7 +8,6 @@ import {
   ListItem,
   ListItemText,
   ListItemIcon,
-  LinearProgress,
   Chip,
   Avatar,
   Button,
@@ -16,10 +15,7 @@ import {
 } from '@material-ui/core';
 import {
   Event as EventIcon,
-  Assignment as TaskIcon,
-  EmojiEvents as TrophyIcon,
-  TrendingUp as TrendingUpIcon,
-  People as PeopleIcon
+  EmojiEvents as TrophyIcon
 } from '@material-ui/icons';
 
 const useStyles = makeStyles((theme) => ({
@@ -36,10 +32,6 @@ const useStyles = makeStyles((theme) => ({
   },
   progressSection: {
     marginBottom: theme.spacing(2),
-  },
-  progress: {
-    height: 10,
-    borderRadius: 5,
   },
   chip: {
     margin: theme.spacing(0.5),
