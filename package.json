@@ -8,10 +8,9 @@
     "dev": "nodemon server.js",
     "client": "cd client && npm start",
     "dev:full": "concurrently \"npm run dev\" \"npm run client\"",
-    "build": "cd client && npm install && npm run build",
+    "build": "cd client && npm install --legacy-peer-deps && npm run build",
     "postinstall": "npm run build",
-    "setup": "npm install && npm run build",
-    "deploy": "npm run build && npm start"
+    "setup": "npm install && npm run build"
   },
   "dependencies": {
     "express": "^4.18.2",
@@ -21,10 +20,10 @@
     "socket.io": "^4.7.2",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
-    "concurrently": "^8.2.1",
     "path": "^0.12.7"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1"
+    "nodemon": "^3.0.1",
+    "concurrently": "^8.2.1"
   }
 }
