@@ -1,13 +1,18 @@
+run = "PORT=3000 npm start"
 language = "nodejs"
-run = "npm run dev"
 entrypoint = "server.js"
-
-[env]
-PORT = "3000"
+hidden = [".config", "package-lock.json"]
+modules = ["nodejs-20:v8-20230920-bd784b9"]
 
 [nix]
 channel = "stable-22_11"
 
+[env]
+PATH = "/home/runner/$REPL_SLUG/.config/npm/node_global/bin:/home/runner/$REPL_SLUG/node_modules/.bin"
+PORT = "3000"
+npm_config_prefix = "/home/runner/$REPL_SLUG/.config/npm/node_global"
+
 [deployment]
-run = ["sh", "-c", "npm start"]
+run = ["sh", "-c", "node server.js"]
 deploymentTarget = "cloudrun"
+ignorePorts = false
