@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { makeStyles } from '@material-ui/core/styles';
+import { styled } from '@mui/material/styles';
 import {
+  Container,
   Grid,
   Paper,
   Typography,
@@ -21,7 +22,7 @@ import {
   Chip,
   IconButton,
   Box
-} from '@material-ui/core';
+} from '@mui/material';
 import {
   Event as EventIcon,
   Add as AddIcon,
@@ -29,13 +30,13 @@ import {
   Delete as DeleteIcon,
   People as PeopleIcon,
   Room as LocationIcon
-} from '@material-ui/icons';
+} from '@mui/icons-material';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
 import eventService from '../services/eventService';
 import { setAlert } from '../redux/actions/uiActions';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = styled((theme) => ({
   root: {
     flexGrow: 1,
     padding: theme.spacing(3),

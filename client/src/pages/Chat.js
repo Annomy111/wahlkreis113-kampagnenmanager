@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { makeStyles } from '@material-ui/core/styles';
+import { styled } from '@mui/material/styles';
 import {
   Grid,
   Paper,
@@ -24,20 +24,20 @@ import {
   Select,
   MenuItem,
   Badge
-} from '@material-ui/core';
+} from '@mui/material';
 import {
   Send as SendIcon,
   Add as AddIcon,
   Group as GroupIcon,
   Person as PersonIcon
-} from '@material-ui/icons';
+} from '@mui/icons-material';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
 import io from 'socket.io-client';
 import chatService from '../services/chatService';
 import { setAlert } from '../redux/actions/uiActions';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = styled((theme) => ({
   root: {
     flexGrow: 1,
     padding: theme.spacing(3),

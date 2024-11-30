@@ -1,5 +1,5 @@
 import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
+import { styled } from '@mui/material/styles';
 import {
   Grid,
   Paper,
@@ -12,13 +12,13 @@ import {
   Avatar,
   Button,
   Box
-} from '@material-ui/core';
+} from '@mui/material';
 import {
   Event as EventIcon,
   EmojiEvents as TrophyIcon
-} from '@material-ui/icons';
+} from '@mui/icons-material';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = styled((theme) => ({
   root: {
     flexGrow: 1,
     padding: theme.spacing(3),

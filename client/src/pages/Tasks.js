@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { makeStyles } from '@material-ui/core/styles';
+import { styled } from '@mui/material/styles';
 import {
   Grid,
   Paper,
@@ -23,7 +23,7 @@ import {
   FormControl,
   InputLabel,
   Select
-} from '@material-ui/core';
+} from '@mui/material';
 import {
   Assignment as TaskIcon,
   Add as AddIcon,
@@ -32,9 +32,9 @@ import {
   CheckCircle as CheckCircleIcon,
   Warning as WarningIcon,
   Schedule as ScheduleIcon
-} from '@material-ui/icons';
+} from '@mui/icons-material';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = styled((theme) => ({
   root: {
     flexGrow: 1,
     padding: theme.spacing(3),

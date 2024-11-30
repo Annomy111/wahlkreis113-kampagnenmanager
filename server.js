@@ -45,12 +45,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Database connection
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost/wahlkreis113';
+const MONGODB_URI = 'mongodb+srv://dietermeier82:7i4XxjLYal4P0Dxx@cluster0.3lg9t.mongodb.net/jdcampaignmanager?retryWrites=true&w=majority&appName=Cluster0';
 mongoose.connect(MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
-.then(() => console.log('MongoDB connected'))
+.then(() => console.log('MongoDB connected successfully'))
 .catch(err => console.log('MongoDB connection error:', err));
 
 // API Routes

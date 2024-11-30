@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { styled } from '@mui/material/styles';
 import {
   Grid,
   Paper,
@@ -22,7 +22,7 @@ import {
   IconButton,
   Box,
   Chip
-} from '@material-ui/core';
+} from '@mui/material';
 import {
   Home as HomeIcon,
   Person as PersonIcon,
@@ -31,11 +31,11 @@ import {
   Check as CheckIcon,
   Clear as ClearIcon,
   Room as LocationIcon
-} from '@material-ui/icons';
+} from '@mui/icons-material';
 import districtService from '../services/districtService';
 import { setAlert } from '../redux/actions/uiActions';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = styled((theme) => ({
   root: {
     flexGrow: 1,
     padding: theme.spacing(3),
@@ -75,7 +75,7 @@ const useStyles = makeStyles((theme) => ({
 const DoorToDoor = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const theme = useTheme();
+  const theme = styled((theme) => theme);
   const [districts, setDistricts] = useState([]);
   const [selectedDistrict, setSelectedDistrict] = useState(null);
   const [householdDialog, setHouseholdDialog] = useState(false);
