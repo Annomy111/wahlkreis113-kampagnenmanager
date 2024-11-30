@@ -1,4 +1,4 @@
-run = "PORT=3000 npm start"
+run = "npm start"
 language = "nodejs"
 entrypoint = "server.js"
 hidden = [".config", "package-lock.json"]
@@ -13,6 +13,6 @@ PORT = "3000"
 npm_config_prefix = "/home/runner/$REPL_SLUG/.config/npm/node_global"
 
 [deployment]
-run = ["sh", "-c", "node server.js"]
+run = ["sh", "-c", "npm start"]
 deploymentTarget = "cloudrun"
 ignorePorts = false
