@@ -13,7 +13,7 @@ const app = express();
 const server = http.createServer(app);
 
 // Update PORT for Replit
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;  // Changed to 5000 to match your current setup
 
 // Handle Replit-specific environment
 const CLIENT_URL = process.env.REPL_SLUG 
@@ -90,14 +90,27 @@ io.on('connection', (socket) => {
   });
 });
 
+// API test route
+app.get('/api/test', (req, res) => {
+  res.json({ message: 'API is working!' });
+});
+
 // Serve static files in production or Replit environment
 if (process.env.NODE_ENV === 'production' || process.env.REPL_SLUG) {
   console.log('Serving static files from client/build');
-  app.use(express.static('client/build'));
   
+  // Serve static files from the React app
+  app.use(express.static(path.join(__dirname, 'client/build')));
+  
+  // The "catchall" handler: for any request that doesn't
+  // match one above, send back React's index.html file.
   app.get('*', (req, res) => {
     console.log(`Serving index.html for ${req.url}`);
-    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
+    res.sendFile(path.join(__dirname, 'client/build/index.html'));
+  });
+} else {
+  app.get('/', (req, res) => {
+    res.send('API is running... Please start the React development server for the frontend.');
   });
 }
 
